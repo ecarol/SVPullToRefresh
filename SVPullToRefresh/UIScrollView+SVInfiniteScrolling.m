@@ -10,7 +10,6 @@
 #import <QuartzCore/QuartzCore.h>
 #import "UIScrollView+SVInfiniteScrolling.h"
 
-
 static CGFloat const SVInfiniteScrollingViewHeight = 60;
 
 @interface SVInfiniteScrollingDotView : UIView
@@ -281,20 +280,24 @@ UIEdgeInsets scrollViewOriginalContentInsets;
         CGRect viewBounds = [self.activityIndicatorView bounds];
         CGPoint origin = CGPointMake(roundf((self.bounds.size.width-viewBounds.size.width)/2), roundf((self.bounds.size.height-viewBounds.size.height)/2));
         [self.activityIndicatorView setFrame:CGRectMake(origin.x, origin.y, viewBounds.size.width, viewBounds.size.height)];
-        
-        switch (newState) {
-            case SVInfiniteScrollingStateStopped:
-                [self.activityIndicatorView stopAnimating];
-                break;
-                
-            case SVInfiniteScrollingStateTriggered:
-                [self.activityIndicatorView startAnimating];
-                break;
-                
-            case SVInfiniteScrollingStateLoading:
-                [self.activityIndicatorView startAnimating];
-                break;
-        }
+        customView = self.activityIndicatorView;
+    }
+    
+    switch (newState) {
+        case SVInfiniteScrollingStateStopped:
+            if ([customView respondsToSelector:@selector(stopAnimating)]) {
+                [customView performSelector:@selector(stopAnimating) withObject:nil];
+            }
+            break;
+            
+        case SVInfiniteScrollingStateTriggered:
+            break;
+            
+        case SVInfiniteScrollingStateLoading:
+            if ([customView respondsToSelector:@selector(startAnimating)]) {
+                [customView performSelector:@selector(startAnimating) withObject:nil];
+            }
+            break;
     }
     
     if(previousState == SVInfiniteScrollingStateTriggered && newState == SVInfiniteScrollingStateLoading && self.infiniteScrollingHandler && self.enabled)

@@ -38,6 +38,7 @@ typedef NSUInteger SVPullToRefreshState;
 @property (nonatomic, strong, readonly) UILabel *titleLabel;
 @property (nonatomic, strong) UIView *activityIndicatorView;
 @property (nonatomic, readonly) SVPullToRefreshState state;
+@property (nonatomic, readwrite) CGFloat originalTopInset;
 
 - (void)setTitle:(NSString *)title forState:(SVPullToRefreshState)state;
 - (void)setCustomView:(UIView *)view forState:(SVPullToRefreshState)state;

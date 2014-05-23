@@ -28,7 +28,6 @@ static CGFloat const SVPullToRefreshViewMargin = 60;
 @property (nonatomic, strong) NSMutableArray *viewForState;
 
 @property (nonatomic, weak) UIScrollView *scrollView;
-@property (nonatomic, readwrite) CGFloat originalTopInset;
 
 @property (nonatomic, assign) BOOL wasTriggeredByUser;
 @property (nonatomic, assign) BOOL showsPullToRefresh;

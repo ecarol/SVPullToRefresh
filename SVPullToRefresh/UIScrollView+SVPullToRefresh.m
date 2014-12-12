@@ -268,9 +268,7 @@ static char UIScrollViewPullToRefreshView;
 - (UIView *)activityIndicatorView {
     if(!_activityIndicatorView) {
         _activityIndicatorView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
-        if ([_activityIndicatorView respondsToSelector:@selector(hidesWhenStopped)]) {
-            objc_msgSend(_activityIndicatorView, @selector(setHidesWhenStopped:), YES);
-        }
+        _activityIndicatorView.hidesWhenStopped = YES;
         [self addSubview:_activityIndicatorView];
     }
     return _activityIndicatorView;

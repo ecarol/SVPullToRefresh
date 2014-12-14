@@ -15,7 +15,7 @@
 #define fequalzero(a) (fabs(a) < FLT_EPSILON)
 
 static CGFloat const SVPullToRefreshViewHeight = 480;
-static CGFloat const SVPullToRefreshViewMargin = 60;
+static CGFloat const SVPullToRefreshViewMargin = 64;
 
 @interface SVPullToRefreshView ()
 

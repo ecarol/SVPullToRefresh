@@ -161,20 +161,33 @@ static char UIScrollViewPullToRefreshView;
     
     [self.titleLabel sizeToFit];
     
-    float left = (self.bounds.size.width - self.titleLabel.frame.size.width -
-                  self.activityIndicatorView.frame.size.width - 5.0f) / 2;
-    CGRect activityFrame = self.activityIndicatorView.frame;
-    activityFrame.origin.x = left;
-    activityFrame.origin.y = self.bounds.size.height - (SVPullToRefreshViewMargin + activityFrame.size.height) / 2;
-    self.activityIndicatorView.frame = activityFrame;
+    float left = (self.bounds.size.width - self.titleLabel.frame.size.width - self.activityIndicatorView.frame.size.width - 5.0f) / 2;
+    float top = self.bounds.size.height - (SVPullToRefreshViewMargin + self.activityIndicatorView.frame.size.height) / 2;
+
+    [self removeConstraints:self.constraints];
+    [self addConstraint:[NSLayoutConstraint constraintWithItem:self.activityIndicatorView
+                                                     attribute:NSLayoutAttributeLeft
+                                                     relatedBy:NSLayoutRelationEqual
+                                                        toItem:self
+                                                     attribute:NSLayoutAttributeLeft
+                                                    multiplier:1.0
+                                                      constant:left]];
+    [self addConstraint:[NSLayoutConstraint constraintWithItem:self.activityIndicatorView
+                                                     attribute:NSLayoutAttributeTop
+                                                     relatedBy:NSLayoutRelationEqual
+                                                        toItem:self
+                                                     attribute:NSLayoutAttributeTop
+                                                    multiplier:1.0
+                                                      constant:top]];
     
     self.titleLabel.center = self.activityIndicatorView.center;
     CGRect titleFrame = self.titleLabel.frame;
-    titleFrame.origin.x = activityFrame.origin.x + activityFrame.size.width + 5.0f;
+    titleFrame.origin.x = CGRectGetMaxX(self.activityIndicatorView.frame) + 5.0f;
     self.titleLabel.textAlignment = NSTextAlignmentCenter;
     self.titleLabel.frame = titleFrame;
     
     for(id otherView in self.viewForState) {
+        
         if([otherView isKindOfClass:[UIView class]])
             [otherView removeFromSuperview];
     }
@@ -187,7 +200,8 @@ static char UIScrollViewPullToRefreshView;
     if(hasCustomView) {
         [self addSubview:customView];
         CGRect viewBounds = [customView bounds];
-        CGPoint origin = CGPointMake(roundf((self.bounds.size.width-viewBounds.size.width)/2), roundf((self.bounds.size.height-viewBounds.size.height)/2));
+        CGPoint origin = CGPointMake(roundf((self.bounds.size.width - viewBounds.size.width) / 2),
+                                     roundf((self.bounds.size.height - viewBounds.size.height)/2));
         [customView setFrame:CGRectMake(origin.x, origin.y, viewBounds.size.width, viewBounds.size.height)];
     }
     else {
@@ -255,6 +269,13 @@ static char UIScrollViewPullToRefreshView;
             self.state = SVPullToRefreshStateTriggered;
         else if(contentOffset.y >= scrollOffsetThreshold && self.state != SVPullToRefreshStateStopped)
             self.state = SVPullToRefreshStateStopped;
+        else if (self.scrollView.isDragging) {
+            if ([self.activityIndicatorView respondsToSelector:@selector(dragingAnimating:)]) {
+                
+                CGFloat offset = MAX(self.scrollView.contentOffset.y * -1, 0.0f);
+                [self.activityIndicatorView performSelector:@selector(dragingAnimating:) withObject:[NSNumber numberWithFloat:offset]];
+            }
+        }
     } else {
         CGFloat offset = MAX(self.scrollView.contentOffset.y * -1, 0.0f);
         offset = MIN(offset, self.originalTopInset + SVPullToRefreshViewMargin);
@@ -280,8 +301,22 @@ static char UIScrollViewPullToRefreshView;
         
         [_activityIndicatorView removeFromSuperview];
         _activityIndicatorView = activityIndicatorView;
+        _activityIndicatorView.translatesAutoresizingMaskIntoConstraints = NO;
+        [_activityIndicatorView addConstraint:[NSLayoutConstraint constraintWithItem:_activityIndicatorView
+                                                                           attribute:NSLayoutAttributeHeight
+                                                                           relatedBy:NSLayoutRelationEqual
+                                                                              toItem:nil
+                                                                           attribute:NSLayoutAttributeNotAnAttribute
+                                                                          multiplier:1.0
+                                                                            constant:_activityIndicatorView.frame.size.height]];
+        [_activityIndicatorView addConstraint:[NSLayoutConstraint constraintWithItem:_activityIndicatorView
+                                                                           attribute:NSLayoutAttributeWidth
+                                                                           relatedBy:NSLayoutRelationEqual
+                                                                              toItem:nil
+                                                                           attribute:NSLayoutAttributeNotAnAttribute
+                                                                          multiplier:1.0
+                                                                            constant:_activityIndicatorView.frame.size.width]];
         [self addSubview:_activityIndicatorView];
-        
         [self setNeedsLayout];
     }
 }

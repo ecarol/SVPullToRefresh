@@ -223,6 +223,8 @@ static char UIScrollViewPullToRefreshView;
                 break;
         }
     }
+    
+    [super layoutSubviews];
 }
 
 #pragma mark - Scroll View
